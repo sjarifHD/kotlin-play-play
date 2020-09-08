@@ -20,7 +20,8 @@ data class Response<Any>(
 data class FeedLog(
     val timestamp: Long,
     val amount: Int,
-    val trigger: Int
+    val trigger: Int,
+    val pond_id: Int = 1234567
 )
 
 fun generateFeedLog(
@@ -42,6 +43,8 @@ fun generateFeedLog(
             feedLogs.add((FeedLog(getTimestampFromISO8601(dateTimeIso), amount, 3)))
         }
     }
+    feedLogs.removeLast()
+    feedLogs.removeLast()
 
     return Response(true, feedLogs.size, feedLogs)
 }
@@ -52,7 +55,7 @@ fun defaultGenerator(): Response<FeedLog> {
     val startDate = LocalDate.of(2020, 1, 5)
     val endDate = LocalDate.of(2020, 2, 8)
 
-    return generateFeedLog(startHour, endHour, 6, startDate, endDate, 1, 2000)
+    return generateFeedLog(startHour, endHour, 6, startDate, endDate, 1, 1250000)
 }
 
 fun getFromFile(): Response<FeedLog> {
