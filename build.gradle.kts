@@ -16,9 +16,10 @@ repositories {
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.0")
 
-    implementation("com.squareup.moshi:moshi-kotlin:1.9.3")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.0")
+    implementation("com.squareup.moshi:moshi-kotlin:1.9.3")
     kapt("com.squareup.moshi:moshi-kotlin-codegen:1.9.3")
+    implementation("com.daveanthonythomas.moshipack:moshipack:1.0.1")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.6.2")
 }

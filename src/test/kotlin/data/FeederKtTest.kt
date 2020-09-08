@@ -1,8 +1,16 @@
 package data
 
+import com.daveanthonythomas.moshipack.MoshiPack
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.MsgpackIntByte
+import com.squareup.moshi.MsgpackWriter
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import helper.decreasePercentage
 import helper.gzip
 import helper.ungzip
+import okio.Buffer
+import okio.BufferedSource
+import okio.ByteString
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -43,7 +51,29 @@ internal class FeederKtTest {
             decreasePercentage(feedLogsZipped.size.toDouble(), feedLogsJsonString.length.toDouble())
         println("size decreased: $percentageDecrease%")
 
-        assert(feedLogsUnzipped == feedLogsJsonString)
+        assertEquals(feedLogsJsonString, feedLogsUnzipped)
+    }
+
+    @Test
+    fun `compare size messagepack`() {
+        val path = "src/test/resources/feedlogs.json"
+        val file = File(path)
+        val absolutePath = file.absolutePath
+
+        val feedLogsStringFromFile = File(absolutePath).readText(Charsets.UTF_8)
+        println("size of original: ${feedLogsStringFromFile.length} bytes")
+
+        val packed: BufferedSource = MoshiPack.jsonToMsgpack(feedLogsStringFromFile)
+        println("size packed: ${packed.buffer.size()} bytes")
+
+        // masih gagal sih ini
+//        val unpacked = MoshiPack.msgpackToJson(packed.readByteArray())
+//        println("size unpacked: ${unpacked.length} bytes")
+//        println(unpacked)
+
+        val percentageDecrease =
+            decreasePercentage(packed.buffer.size().toDouble(), feedLogsStringFromFile.length.toDouble())
+        println("size decreased: $percentageDecrease%")
     }
 
     @Test

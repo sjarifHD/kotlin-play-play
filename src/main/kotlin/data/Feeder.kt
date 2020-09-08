@@ -59,7 +59,7 @@ object FeedLogData {
         return generateFeedLog(startHour, endHour, 6, startDate, endDate, 1, 1250000)
     }
 
-    private fun getJsonAdapter(): ResponseJsonAdapter<FeedLog> {
+    fun getJsonAdapter(): ResponseJsonAdapter<FeedLog> {
         val moshi = Moshi.Builder()
             .add(KotlinJsonAdapterFactory())
             .build()
