@@ -26,7 +26,7 @@ class HourProgression(
 
     override fun iterator(): Iterator<LocalTime> = HourIterator(start, endInclusive, stepHours)
 
-    infix fun step(hours: Long) = HourProgression(start, endInclusive, stepHours)
+    infix fun step(hours: Long) = HourProgression(start, endInclusive, hours)
 }
 
 operator fun LocalTime.rangeTo(other: LocalTime) = HourProgression(this, other)
