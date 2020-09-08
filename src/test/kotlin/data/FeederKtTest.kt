@@ -1,8 +1,6 @@
 package data
 
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import helper.calculatePercentage
+import helper.decreasePercentage
 import helper.gzip
 import helper.ungzip
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -12,23 +10,17 @@ import java.io.File
 
 internal class FeederKtTest {
 
+    private val feedLogs = FeedLogData.defaultGenerator()
+    private val feedLogsJsonString = FeedLogData.toJsonString(feedLogs)
+
     @Test
-    fun `generate feedLogs`() {
-        val feedLogs = defaultGenerator()
-
-        val moshi = Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
-            .build()
-
-        val dataAdapter = ResponseJsonAdapter<FeedLog>(moshi, arrayOf(FeedLog::class.java))
-        val feedLogsJsonString = dataAdapter.toJson(feedLogs)
-
+    fun `get feedLogs`() {
         val path = "src/test/resources/feedlogs.json"
         val file = File(path)
         val absolutePath = file.absolutePath
 
         val feedLogsStringFromFile = File(absolutePath).readText(Charsets.UTF_8)
-        val feedLogsFromFile = dataAdapter.fromJson(feedLogsStringFromFile)
+        val feedLogsFromFile = FeedLogData.jsonStringToModel(feedLogsStringFromFile)
 
         println("Json from generator size: ${feedLogsJsonString.length}")
         println("Json from file size: ${feedLogsStringFromFile.length}")
@@ -39,24 +31,16 @@ internal class FeederKtTest {
 
     @Test
     fun `compare size gzip`() {
-        val feedLogs = defaultGenerator()
-
-        val moshi = Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
-            .build()
-
-        val dataAdapter = ResponseJsonAdapter<FeedLog>(moshi, arrayOf(FeedLog::class.java))
-        val feedLogsJsonString = dataAdapter.toJson(feedLogs)
-        println("size of original: ${feedLogsJsonString.length}")
+        println("size of original: ${feedLogsJsonString.length} bytes")
 
         val feedLogsZipped = gzip(feedLogsJsonString)
-        println("size zipped: ${feedLogsZipped.size}")
+        println("size zipped: ${feedLogsZipped.size} bytes")
 
         val feedLogsUnzipped = ungzip(feedLogsZipped)
-        println("size unzipped: ${feedLogsUnzipped.length}")
+        println("size unzipped: ${feedLogsUnzipped.length} bytes")
 
-        val decreaseSize = feedLogsJsonString.length - feedLogsZipped.size
-        val percentageDecrease = calculatePercentage(decreaseSize.toDouble(), feedLogsJsonString.length.toDouble())
+        val percentageDecrease =
+            decreasePercentage(feedLogsZipped.size.toDouble(), feedLogsJsonString.length.toDouble())
         println("size decreased: $percentageDecrease%")
 
         assert(feedLogsUnzipped == feedLogsJsonString)
